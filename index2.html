@@ -1,0 +1,22 @@
+<button id="test">hi</button>
+<br><br>
+<label>
+    Time 1: <input type="checkbox" id="mycheckbox1" name = "1"/>
+    <div id="container0"></div>
+    Time 2: <input type="checkbox" id="mycheckbox2" name = "2"/>
+    <div id="container0"></div>
+    Time 3: <input type="checkbox" id="mycheckbox3" name = "3"/>
+    <div id="container0"></div>
+</label>
+
+
+<script>
+
+document.getElementById("test").onclick = function() {
+    window.location.replace("https://app.cronofy.com/oauth/authorize
+    ?response_type=code
+    &client_id=kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D
+    &redirect_uri=localhost:50000
+    &scope=read_events");
+};
+</script>

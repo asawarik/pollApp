@@ -1,0 +1,40 @@
+<script src="https://code.jquery.com/jquery-3.2.1.js"   integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="   crossorigin="anonymous"></script>
+<button onclick="test()">hi</button>
+<button onclick="test2()">bye</button>
+<script>
+function test() {
+    window.location.replace("https://app.cronofy.com/oauth/authorize/?response_type=code&client_id=kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D&redirect_uri=http://localhost:50000/&scope=read_events");
+};
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+};
+// function test2() {
+//     window.location.replace("https://api.cronofy.com/oauth/token/client_id=kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-Dclient_secret=jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wAgrant_type=authorization_codecode="+code+"redirect_uri=http://localhost:50000");
+// };
+function test2() {
+    window.location.replace("http://localhost:50000/test2");
+};
+//     var data = {};
+//     data.title = "title";
+//     data.message = "message";
+//         $.ajax({
+//             type: 'POST',
+//             data: JSON.stringify(data),
+//             contentType: 'application/json',
+//             url: 'http://localhost:50000/endpoint',                      
+//             success: function(data) {
+//                 console.log('success');
+//                 console.log(JSON.stringify(data));
+//             }
+//         });
+// };
+var code = getParameterByName('code');
+console.log(code);
+localStorage["code"] = code;
+</script>

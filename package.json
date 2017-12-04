@@ -18,6 +18,9 @@
   "homepage": "https://github.com/asawarik/pollApp#readme",
   "dependencies": {
     "cronofy": "^2.5.1",
-    "morgan": "^1.9.0"
+    "morgan": "^1.9.0",
+    "passport-oauth2": "^1.4.0",
+    "query-string": "^5.0.1",
+    "request": "^2.83.0"
   }
 }
