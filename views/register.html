@@ -1,13 +1,69 @@
+
+<head>
+  <title>Register</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:900" rel="stylesheet"> 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css"> <!-- animate -->
+  <script src="https://use.fontawesome.com/47a7c6d863.js"></script>
+</head>
+<body>
+<div class="container">
+
+<div class="bg"></div>
 <h2> hello register </h2>
+<div class="formPos">
+<form action="/users/register" method="post">
+ <div class="form-row">
+    <div class="form-group col-md-6">
+      <label>Email</label>
+      <input name="email" type="text" class="form-control" placeholder="Email" required>
+    </div>
+    <div class="form-group col-md-6">
+      <label>Username</label>
+      <input name="username" type="text" class="form-control" placeholder="Username"required >
+    </div>
+  </div>
+  <div class="form-group col-md-6">
+      <label>Password</label>
+      <input name="password" type="text" class="form-control" placeholder="Password" required>
+    </div>
+    <div class="form-group col-md-6">
+      <label>Confirm P</label>
+      <input name="password2" type="text" class="form-control" placeholder="Username"required >
+    </div>
+  </div>
+<button type="submit" value = "submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
+</div>
 
-<form action="/users/register" method="post" >
-<label>email</label>
-<input name="email" type="text">
-<label>username</label>
-<input name="username" type="text">
-<label>password</label>
-<input name="password" type="text">
-<label>confirm password</label>
-<input name="password2" type="text">
-<input type="submit" value="submit">
+</body>
+<!--<style>
 
+body, html {
+    height: 100%;
+}
+
+.formPos {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+.bg { 
+    /* The image used */
+    background-image: url("https://bhubaneswarlive.com/wp-content/uploads/2016/11/Savin-NY-Website-Background-Web.jpg");
+
+    /* Full height */
+    height: 100%; 
+    width: 100%;
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+</style>           -->
+            
