@@ -15,25 +15,6 @@ router.post("/register", function(req, res) {
     const password = req.body.password;
     const password2 = req.body.password2;
 
-  //   req.checkBody("email", "email is required").notEmpty();
-  //   req.checkBody("email", "email is not valid").isEmail();
-  //   req.checkBody("username", "username is required").notEmpty();
-  //   req.checkBody("password", "password is required").notEmpty();
-  //   //req.checkBody('password', 'Password is required').notEmpty();
-  //   req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
-
-  //   req.getValidationResult()
-  //  .then(function(res){
-  //       errors = res.array();
-  //    console.log(res.array());
-  //  });
-  //   console.log("got my errors");
-  // if(errors){
-  //   console.log("i have an error");
-  //   res.render('register', {
-  //     errors:errors
-  //   });
-  // } else {
     console.log("about to create new user");
     let newUser = new User({
       email:email,
