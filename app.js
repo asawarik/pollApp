@@ -1,65 +1,97 @@
-/////////////////////////////////////
-var Cronofy = require('cronofy');
+const express = require('express');
+const path = require('path');
+const mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
+const bodyParser = require('body-parser');
+const expressValidator = require('express-validator');
+const flash = require('connect-flash');
+const session = require('express-session');
+const passport = require('passport');
+const config = require('./config/database');
 
-var client = new Cronofy({
-  access_token: 'TNkZwDizIfW5yL5jCZ5gQHhD5bL96mLX',
+mongoose.connect(config.database);
+let db = mongoose.connection;
+
+// Check connection
+db.once('open', function(){
+  console.log('Connected to MongoDB');
 });
 
-var options1 = {
-  tzid: 'Etc/UTC'
-};
-
-var options2 = {
-  to: "2017-11-28T12:00:00Z",
-  from: "2017-11-29T12:00:00Z",
-  tzid: 'Etc/UTC'
-};
-
-client.listCalendars(options1)
-  .then(function (response) {
-        console.log("LIST CALANDERS");
-      var calendars = response.calendars;
-      console.log(calendars);
-  });
-// client.readEvents(options)
-//   .then(function (response) {
-//     //console.log("in the read function");
-//       var events = response.events;
-//       //console.log(events);
-//   });
-
-// client.freeBusy(options2)
-//   .then(function (response) {
-//     console.log("in the free busy");
-//       var events = response.events;
-//       console.log(events);
-//   });
-
-// var options = {
-//   calendar_id: "cal_Wh3ecMYxg0neAAGL_PwB8sp57DFTZXwQ3@Q2CPg",
-//   event_id: "unique-event-id",
-//   summary: "Board meeting",
-//   description: "Discuss plans for the next quarter.",
-//   start: "2017-12-01T12:00:00Z",
-//   end: "2017-12-01T12:30:00Z",
-//   location: {
-//     description: "Board room"
-//   }
-// };
-
-// client.createEvent(options)
-//   .then(function () {
-//       console.log("created!");// Success
-//   });
-//////////////////////////////////
-var express = require("express");
-var morgan = require('morgan')
-var app = express()
-app.set('view engine', 'ejs');app.set('view engine', 'ejs');
-app.use(morgan('tiny'))
-var http=require('http')
-app.use(express.static('public'));
-app.get("/", function(req, res) {
-    res.sendFile(__dirname + '/index.html');
+// Check for DB errors
+db.on('error', function(err){
+  console.log(err);
 });
-app.listen(50000);
+
+// Init App
+const app = express();
+
+// Bring in Models
+
+// Load View Engine
+var engines = require('consolidate');
+
+app.set('views', __dirname + '/views');
+app.engine('html', engines.mustache);
+app.set('view engine', 'html');
+
+// Body Parser Middleware
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+// parse application/json
+app.use(bodyParser.json());
+
+// Set Public Folder
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Express Session Middleware
+app.use(session({
+  secret: 'keyboard cat',
+  resave: true,
+  saveUninitialized: true
+}));
+
+// Express Messages Middleware
+app.use(require('connect-flash')());
+app.use(function (req, res, next) {
+  res.locals.messages = require('express-messages')(req, res);
+  next();
+});
+
+// Express Validator Middleware
+app.use(expressValidator({
+  errorFormatter: function(param, msg, value) {
+      var namespace = param.split('.')
+      , root    = namespace.shift()
+      , formParam = root;
+
+    while(namespace.length) {
+      formParam += '[' + namespace.shift() + ']';
+    }
+    return {
+      param : formParam,
+      msg   : msg,
+      value : value
+    };
+  }
+}));
+
+// Passport Config
+require('./config/passport')(passport);
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('*', function(req, res, next){
+  res.locals.user = req.user || null;
+  next();
+});
+
+
+// Route Files
+let users = require('./routes/users');
+app.use('/users', users);
+
+// Start Server
+app.listen(50000, function(){
+  console.log('Server started on port 3000...');
+});
