@@ -55,6 +55,10 @@ router.get('/loginFail', function(req, res){
 router.get('/loginSuccess', function(req, res){
   res.render('loginSuccess');
 });
+
+router.get('/signup', function(req, res){
+  res.render('signup');
+});
 // Login Process
 router.post('/login', function(req, res, next){
   passport.authenticate('local', {
