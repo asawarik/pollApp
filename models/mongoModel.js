@@ -1,6 +1,5 @@
 // include my model for this application
 var mongoModel = require("../models/mongoModel.js")
-
 // Define the routes for this controller
 exports.init = function(app) {
 app.get('/', index); // essentially the app welcome page

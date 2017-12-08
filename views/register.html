@@ -62,5 +62,6 @@ function getParameterByName(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 };
 var code = getParameterByName("code");
+console.log(code);
 $("#code").val(code);
 </script>
