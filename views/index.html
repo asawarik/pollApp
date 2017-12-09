@@ -2,7 +2,11 @@
 
 hello
 <div id="calendarTime"></div>
+<div id="calendarTime2"></div>
 <script>
 var tok = localStorage.getItem("token");
 $("#calendarTime").html(tok);
+var rTok = localStorage.getItem("rToken");
+$("#calendarTime2").html(rTok);
+//window.location.replace("https://api.cronofy.com/v1/calendars");
 </script>

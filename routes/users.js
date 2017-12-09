@@ -7,7 +7,7 @@ const passport = require('passport');
 let User = require("../models/user");
 
 router.get("/register", function(req, res) {
-    res.render("register");
+    res.render("register.html");
 });
 var headers = {
     'Accept':     'application/json',
@@ -46,6 +46,7 @@ router.post("/register", function(req, res) {
         console.log(body);
         console.log(body["access_token"]);
         access_token = body["access_token"];
+        refresh_token = body["refresh_token"];
         console.log("about to create new user");
         console.log("aCCESS TOKEN");
         console.log(access_token);
@@ -53,7 +54,8 @@ router.post("/register", function(req, res) {
           email:email,
           username:username,
           password:password,
-          access_token:access_token
+          access_token:access_token,
+          refresh_token:refresh_token
         });
          bcrypt.genSalt(10, function(err, salt){
           bcrypt.hash(newUser.password, salt, function(err, hash){
