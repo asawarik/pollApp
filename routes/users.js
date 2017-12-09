@@ -27,7 +27,7 @@ var options = {
         }   
 };
 
-
+//adding new user to the db
 router.post("/register", function(req, res) {
     console.log("im here");
     const email = req.body.email;
@@ -77,22 +77,34 @@ router.post("/register", function(req, res) {
       } //if !error statement  
     }); //request function   
 }); //router post
+//Fetching all users from the db 
+router.get('/yay', function(req, res) {
+  User.find({}, function(err, docs) {
+    if(err) {
+    res.json(err);
+    } else {
+      console.log(docs);
+      res.render('yay', {users: docs});
+    }
+  });
+});
+
 
 // Login Form
 router.get('/login', function(req, res){
-  res.render('login');
+  res.render('login.html');
 });
 
 router.get('/loginFail', function(req, res){
-  res.render('loginFail');
+  res.render('loginFail.html');
 });
 
 router.get('/loginSuccess', function(req, res){
-  res.render('loginSuccess');
+  res.render('loginSuccess.html');
 });
 
 router.get('/signup', function(req, res){
-  res.render('signup');
+  res.render('signup.html');
 });
 // Login Process
 router.post('/login', function(req, res, next){

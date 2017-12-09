@@ -1,0 +1,17 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+Find a user to compare your calander with!!
+<select onchange="hello(this)">
+<% for(var i=0; i<users.length; i++) {%>
+   <option value = <%=users[i].access_token%> ><%= users[i].username %></option>
+<% } %>
+</select>
+
+<script>
+function hello(s) {
+    var token = s[s.selectedIndex].value;
+    console.log(token);
+    <!-- temp solution thing to only let you check with one person -->
+    localStorage["token"] = token;
+    window.location.replace("http://localhost:50000/");
+  };
+</script>

@@ -32,9 +32,11 @@ const app = express();
 var engines = require('consolidate');
 
 app.set('views', __dirname + '/views');
-app.engine('html', engines.mustache);
-app.set('view engine', 'html');
-
+app.set('view engine', 'ejs')
+app.engine('html', require('ejs').renderFile);
+app.get('/', function(req, res){
+  res.render('index.html');
+});
 // Body Parser Middleware
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -75,7 +77,13 @@ app.use(expressValidator({
     };
   }
 }));
-
+//
+app.post("/", function(req, res) {
+  console.log("hello!!");
+  console.log(req);
+  res.render("index.html");
+  
+});
 // Passport Config
 require('./config/passport')(passport);
 // Passport Middleware
