@@ -19,6 +19,10 @@ const UserSchema = mongoose.Schema ({
     refresh_token: {
         type:String, 
         required:true
+    },
+    cal_id: {
+        type: String, 
+        required:true
     }
 
 });

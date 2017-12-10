@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require('passport');
+var template = null;
 let User = require("../models/user");
 
 router.get("/register", function(req, res) {
@@ -27,6 +28,31 @@ var options = {
         }   
 };
 
+var headers1 = {
+    'Accept':     'application/json',
+    'Accept-Charset': 'utf-8',
+    Authorization: ""
+}
+
+// Configure the request
+var options1 = {
+    headers: headers1,
+    uri: 'https://api.cronofy.com/v1/userinfo',
+    method: 'GET'
+};
+function getCalID(access_token) {
+  headers1["Authorization"] = "Bearer " + access_token;
+  request(options1, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+        var parseBody = JSON.parse(body);
+        template = parseBody["sub"];
+
+    }
+    else {
+      console.log("no");
+    }
+  });
+};
 //adding new user to the db
 router.post("/register", function(req, res) {
     console.log("im here");
@@ -47,15 +73,25 @@ router.post("/register", function(req, res) {
         console.log(body["access_token"]);
         access_token = body["access_token"];
         refresh_token = body["refresh_token"];
-        console.log("about to create new user");
-        console.log("aCCESS TOKEN");
+        calID = getCalID(access_token);
+        function doStuff() {
+          if(template== undefined) {//we want it to match
+            console.log (template)
+            setTimeout(doStuff, 50);//wait 50 millisecnds then recheck
+            return;
+          }
+        else {
+        calId = template;
+        console.log(calID);
+        console.log(template);
         console.log(access_token);
         let newUser = new User({
           email:email,
           username:username,
           password:password,
           access_token:access_token,
-          refresh_token:refresh_token
+          refresh_token:refresh_token,
+          cal_id:calId
         });
          bcrypt.genSalt(10, function(err, salt){
           bcrypt.hash(newUser.password, salt, function(err, hash){
@@ -70,12 +106,16 @@ router.post("/register", function(req, res) {
               console.log(err);
               return;
             } else {
+              console.log("this happened");
               req.flash('success','You are now registered and can log in');
               res.redirect('/users/login');
             }
           });//newUser.save
         });//bryp.hash
       });//bcryptgensalt
+       }
+       };
+       doStuff();
       } //if !error statement  
     }); //request function   
 }); //router post
