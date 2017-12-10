@@ -1,0 +1,12 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+hello <%=currUser.cal_id%>
+<div id="calendarTime"></div>
+<div id="calendarTime2"></div>
+<script>
+var access_token = localStorage.getItem("access_token");
+var refresh_token = localStorage.getItem("refresh_token");
+var cal_id = localStorage.getItem("cal_id");
+$("#calendarTime2").html(cal_id);
+//window.location.replace("https://api.cronofy.com/v1/calendars");
+</script>

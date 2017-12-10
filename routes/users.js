@@ -1,7 +1,6 @@
 const morgan = require('morgan');
 const request = require("request");
 const express = require("express");
-//const session = require('express-session');
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require('passport');
@@ -47,6 +46,7 @@ function getCalID(access_token) {
   request(options1, function(error, response, body) {
     if (!error && response.statusCode == 200) {
         var parseBody = JSON.parse(body);
+        console.log(parseBody);
         template = parseBody["sub"];
 
     }
@@ -57,7 +57,7 @@ function getCalID(access_token) {
 };
 //adding new user to the db
 router.post("/register", function(req, res) {
-    console.log("im here");
+    //console.log("im here");
     const email = req.body.email;
     const username = req.body.username;
     const password = req.body.password;
@@ -65,14 +65,12 @@ router.post("/register", function(req, res) {
     const code = req.body.code;
     var access_token = "";
     options["json"]["code"] = code;
-    console.log("CODEEEEE");
-    console.log(options);
+    //console.log("CODEEEEE");
+    //console.log(options);
     request(options, function (error, response, body) {
-      
+      console.log("fejwjfWEEEE");
       if (!error && response.statusCode == 200) {
         console.log("HELLLLO IM HERE");
-        console.log(body);
-        console.log(body["access_token"]);
         access_token = body["access_token"];
         refresh_token = body["refresh_token"];
         calID = getCalID(access_token);
@@ -93,7 +91,7 @@ router.post("/register", function(req, res) {
           password:password,
           access_token:access_token,
           refresh_token:refresh_token,
-          cal_id:calId
+          cal_id:template
         });
          bcrypt.genSalt(10, function(err, salt){
           bcrypt.hash(newUser.password, salt, function(err, hash){
@@ -139,6 +137,39 @@ router.get('/login', function(req, res){
   res.render('login.html');
 });
 
+const Cronofy = require("cronofy");
+var cronofyClient = new Cronofy({
+  "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
+  "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
+  "access_token": "1NPQTGQ7pEnkLnjfGqZwopB3BC2y1Ite",
+  "refresh_token": "-2-bhZ-6BRIm5biGHNuagBagUv4SfFUw"
+});
+ var options7 = {
+  from: "2017-12-08",
+  to: "2017-12-09",
+  tzid: "America/Indianapolis"
+}
+router.get('/poll', function(req, res){
+  console.log(req.session);
+  console.log("in the get");
+  cronofyClient.freeBusy(options)
+   .then(function(response){
+     console.log(response);
+  });
+  request(options7, function (error, response, body) {
+      
+       if (!error && response.statusCode == 200) {
+          console.log("HELLLLO IM HERE");
+          console.log(body);
+        }
+       else{
+         console.log("flisajf");
+        }
+   });
+   res.render('poll.html', {currUser: req.user});
+});
+ 
+
 router.get('/loginFail', function(req, res){
   res.render('loginFail.html');
 });
@@ -148,7 +179,7 @@ router.get('/loginSuccess', function(req, res){
   hello = getAllUsers();
   function doStuff1() {
           if(template2== undefined) {//we want it to match
-            console.log (template)
+            //console.log (template)
             setTimeout(doStuff1, 50);//wait 50 millisecnds then recheck
             return;
           }
@@ -160,8 +191,8 @@ router.get('/loginSuccess', function(req, res){
             req.session.visitCount += 1;
           }
           //console.log(req.session);
-          console.log("END O FSESIOFID");
-          console.log(template2);
+          //console.log("END O FSESIOFID");
+          //console.log(template2);
           res.render('loginSuccess', {user: req.user, allUsers:template2});
         }
       }//closes do stuff function
@@ -178,7 +209,7 @@ function getAllUsers() {
     //res.json(err);
     } else {
       template2 = docs;
-      console.log(allUsers);
+      //console.log(allUsers);
       
     }
   });
