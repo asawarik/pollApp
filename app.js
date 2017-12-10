@@ -1,4 +1,6 @@
+
 const express = require('express');
+const app = express();
 var cookieParser = require('cookie-parser')
 const path = require('path');
 const mongoose = require('mongoose');
@@ -10,6 +12,7 @@ const session = require('express-session');
 const passport = require('passport');
 const config = require('./config/database');
 const request = require("request");
+
 var currUser;
 //var request = require('request');
 
@@ -27,7 +30,7 @@ db.on('error', function(err){
 });
 
 // Init App
-const app = express();
+
 
 // const Cronofy = require("cronofy");
 // var cronofyClient = new Cronofy({
@@ -157,7 +160,20 @@ let users = require('./routes/users');
 let routes = require('./routes/index');
 app.use('/users', users);
 app.use('/', routes);
+
 // Start Server
-app.listen(50000, function(){
+var server = app.listen(50000, function(){
   console.log('Server started on port 50000...');
+});
+
+var io = require("socket.io").listen(server);
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('chat message', function(msg){
+    console.log('message: ' + msg);
+    io.emit('chat message', msg);
+  });
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
 });

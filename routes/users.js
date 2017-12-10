@@ -149,27 +149,29 @@ var cronofyClient = new Cronofy({
   to: "2017-12-09",
   tzid: "America/Indianapolis"
 }
-router.get('/poll', function(req, res){
-  console.log(req.session);
-  console.log("in the get");
-  cronofyClient.freeBusy(options)
-   .then(function(response){
-     console.log(response);
-  });
-  request(options7, function (error, response, body) {
+// router.get('/poll', function(req, res){
+//   console.log(req.session);
+//   console.log("in the get");
+//   cronofyClient.freeBusy(options)
+//    .then(function(response){
+//      console.log(response);
+//   });
+//   request(options7, function (error, response, body) {
       
-       if (!error && response.statusCode == 200) {
-          console.log("HELLLLO IM HERE");
-          console.log(body);
-        }
-       else{
-         console.log("flisajf");
-        }
-   });
-   res.render('poll.html', {currUser: req.user});
-});
+//        if (!error && response.statusCode == 200) {
+//           console.log("HELLLLO IM HERE");
+//           console.log(body);
+//         }
+//        else{
+//          console.log("flisajf");
+//         }
+//    });
+//    res.render('poll.html', {currUser: req.user});
+// });
  
-
+router.get("/poll", function(req, res) {
+  res.render("poll.html");
+});
 router.get('/loginFail', function(req, res){
   res.render('loginFail.html');
 });
