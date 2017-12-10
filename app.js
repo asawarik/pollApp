@@ -1,4 +1,5 @@
 const express = require('express');
+var cookieParser = require('cookie-parser')
 const path = require('path');
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
@@ -27,6 +28,7 @@ db.on('error', function(err){
 
 // Init App
 const app = express();
+
 // const Cronofy = require("cronofy");
 // var cronofyClient = new Cronofy({
 //   "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
@@ -71,24 +73,25 @@ var engines = require('consolidate');
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs')
 app.engine('html', require('ejs').renderFile);
-app.get('/', function(req, res){
-  console.log("in the get");
-  // cronofyClient.freeBusy(options)
-  // .then(function(response){
-  //   console.log(response);
-  // });
-  // request(options1, function (error, response, body) {
+// app.get('/', function(req, res){
+//   console.log(req.session);
+//   console.log("in the get");
+//   // cronofyClient.freeBusy(options)
+//   // .then(function(response){
+//   //   console.log(response);
+//   // });
+//   // request(options1, function (error, response, body) {
       
-  //     if (!error && response.statusCode == 200) {
-  //       console.log("HELLLLO IM HERE");
-  //       console.log(body);
-  //     }
-  //     else{
-  //       console.log("flisajf");
-  //     }
-  // });
-  res.render('index.html');
-});
+//   //     if (!error && response.statusCode == 200) {
+//   //       console.log("HELLLLO IM HERE");
+//   //       console.log(body);
+//   //     }
+//   //     else{
+//   //       console.log("flisajf");
+//   //     }
+//   // });
+//   res.render('index.html');
+// });
 // Body Parser Middleware
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -99,6 +102,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Express Session Middleware
+app.use(cookieParser());
 app.use(session({
   secret: 'keyboard cat',
   resave: true,
@@ -130,12 +134,12 @@ app.use(expressValidator({
   }
 }));
 //
-app.post("/", function(req, res) {
-  console.log("hello!!");
-  console.log(req);
-  res.render("index.html");
+// app.post("/", function(req, res) {
+//   console.log("hello!!");
+//   console.log(req);
+//   res.render("index.html");
 
-});
+// });
 // Passport Config
 require('./config/passport')(passport);
 // Passport Middleware
@@ -150,8 +154,9 @@ app.get('*', function(req, res, next){
 
 // Route Files
 let users = require('./routes/users');
+let routes = require('./routes/index');
 app.use('/users', users);
-
+app.use('/', routes);
 // Start Server
 app.listen(50000, function(){
   console.log('Server started on port 50000...');

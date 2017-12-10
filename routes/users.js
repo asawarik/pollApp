@@ -1,10 +1,12 @@
 const morgan = require('morgan');
 const request = require("request");
 const express = require("express");
+//const session = require('express-session');
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require('passport');
 var template = null;
+var template2 = null;
 let User = require("../models/user");
 
 router.get("/register", function(req, res) {
@@ -141,13 +143,46 @@ router.get('/loginFail', function(req, res){
   res.render('loginFail.html');
 });
 
+
 router.get('/loginSuccess', function(req, res){
-  res.render('loginSuccess.html');
+  hello = getAllUsers();
+  function doStuff1() {
+          if(template2== undefined) {//we want it to match
+            console.log (template)
+            setTimeout(doStuff1, 50);//wait 50 millisecnds then recheck
+            return;
+          }
+        else {
+          if (!req.session.visitCount) {
+            req.session.visitCount = 1;
+          }
+          else {
+            req.session.visitCount += 1;
+          }
+          //console.log(req.session);
+          console.log("END O FSESIOFID");
+          console.log(template2);
+          res.render('loginSuccess', {user: req.user, allUsers:template2});
+        }
+      }//closes do stuff function
+      doStuff1();
 });
 
 router.get('/signup', function(req, res){
   res.render('signup.html');
 });
+function getAllUsers() {
+  var allUsers;
+  User.find({}, function(err, docs) {
+    if(err) {
+    //res.json(err);
+    } else {
+      template2 = docs;
+      console.log(allUsers);
+      
+    }
+  });
+};
 // Login Process
 router.post('/login', function(req, res, next){
   passport.authenticate('local', {

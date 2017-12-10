@@ -1,0 +1,10 @@
+wooo good job loggin in
+you are user <%= user.username %>
+these are the other users:
+<select>
+<% for(var i=0; i<allUsers.length; i++) { %>
+   <option id = <%=allUsers[i].refresh_token%> value = <%=allUsers[i].access_token%> >
+   <%= allUsers[i].username %>
+   </option>
+<% } %>
+</select>
