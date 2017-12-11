@@ -13,23 +13,31 @@ these are the other users:
 <input type="text" name="access_token" id="access_token">
 <input type="text" name="refresh_token" id="refresh_token">
 <input type="text" name="cal_id" id="cal_id">
+<input type="text" name="messageSendUser" id="messageSendUser">
 <input type="text" name = "currCalId" id="currCalId" value=<%=user.cal_id%> >
+<input type="text" name="currUsername" id="username" value = <%=user.username%> >
 <button type="submit"></button>
 </form>
+
 <script>
 $("select").change(function(){
     var access_token = $(this).find(":selected").data("value").access_token;
     var refresh_token = $(this).find(":selected").data("value").refresh_token;
     var cal_id = $(this).find(":selected").data("value").cal_id;
+    var messageSend = $(this).find(":selected").data("value").username;
     console.log(access_token);
     console.log(refresh_token);
     console.log(cal_id);
+    console.log("THE USER TO SEND TO");
+    console.log(messageSend);
     localStorage["access_token"] = access_token;
     localStorage["refresh_token"] = refresh_token;
     localStorage["cal_id"] = cal_id;
+    localStorage["messageSendUser"] = messageSend;
     $("#access_token").val(access_token);
     $("#refresh_token").val(refresh_token);
     $("#cal_id").val(cal_id);
+    $("#messageSendUser").val(messageSend);
     //window.location.replace("http://localhost:50000/users/poll");
 });
 

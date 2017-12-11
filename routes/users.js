@@ -194,7 +194,9 @@ router.post("/poll", function(req, res) {
   var times;
   var calId = req.body.cal_id;
   console.log(calId);
+  var messageUser = req.body.currUsername;
   var access_token = req.body.access_token;
+  var messageSendUser = req.body.messageSendUser;
   headers100["Authorization"] = "Bearer " + access_token;
   request(options100, function(error, response, body) {
     if (!error && response.statusCode == 200) {
@@ -203,7 +205,7 @@ router.post("/poll", function(req, res) {
         times = body["available_periods"];
         console.log("success!");
         console.log(times);
-        res.render("poll.html", {times: times});
+        res.render("poll.html", {times: times, messageUser: messageUser, toUser: messageSendUser});
     }
     else {
       console.log(error);

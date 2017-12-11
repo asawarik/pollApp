@@ -10,6 +10,7 @@ const session = require('express-session');
 const passport = require('passport');
 const config = require('./config/database');
 const request = require("request");
+const connectedUsers = [];
 var currUser;
 //var request = require('request');
 
@@ -162,18 +163,74 @@ var server = app.listen(50000, function(){
   console.log('Server started on port 50000...');
 });
 
+function findSocket(username, users) {
+  var i;
+  for (i=0; i < users.length; i++) {
+    var userObject = users[i];
+    if (userObject["username"] == username) {
+        return userObject["socketid"];
+    }
+  else {
+    return "not online"
+  }
+}
+};
+
+function removeSocket(disconnectId, users) {
+  var j;
+  for (j=0; j < users.length; j++) {
+    var userObject = users[j];
+    if (userObject["socketid"] == disconnectId) {
+      connectedUsers.splice(j, 1);   
+    }
+  }
+};
+
+function printArray(ugh) {
+  console.log("in the print funciton");
+  var k;
+  for (k=0; k < ugh.length; k++) {
+    var userObject = ugh[k];
+    console.log(JSON.stringify(userObject));
+  }
+};
 var io = require("socket.io").listen(server);
+var toMessage;
+var toSocket;
 io.on('connection', function(socket){
   console.log('a user connected');
-  //console.log(socket);
   var socketid = socket.id;
-  //console.log(socketid);
+  socket.on('messageUser', function(user) {
+    console.log("FROM USER ENTERED");
+    console.log(user);
+    connectedUsers.push({"username":user, "socketid":socketid});
+    printArray(connectedUsers);
+  });
+  socket.on('toMessage', function(username) {
+    console.log("TO USER ENtered");
+    toMessage = username;
+    console.log(toMessage);
+    toSocket = findSocket(toMessage, connectedUsers);
+    console.log(toSocket);
+    //console.log(connectedUsers.toString);
+  });
   socket.on('chat message', function(msg){
     console.log('message: ' + msg);
-    io.sockets.connected[socketid].emit("chat message", "fdislajfiowjeifajflkadsj");
+    io.sockets.connected[toSocket].emit("chat message", msg);
     //io.emit('chat message', msg);
   });
   socket.on('disconnect', function(){
     console.log('user disconnected');
+    var disconnectUser = socket.id;
+    removeSocket(disconnectUser, connectedUsers);
+    printArray(connectedUsers);
+    console.log("completed removal");
+    // var disconnectId = socket.id;
+    // io.emit('getUser', "blah");
+    // console.log("cinpmleted the disconnect");
   });
+  // socket.on("disconnectUser", function(disconnectUser) {
+  //     console.log("hello i am in socket.on");
+  //     removeSocket(disconnectUser, disconnectId, connectedUsers);
+  //   });
 });

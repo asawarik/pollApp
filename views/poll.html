@@ -17,6 +17,10 @@
 <% for(var i=0; i<times.length; i++){ %>
    <li> <%=JSON.stringify(times[i]) %></li>
 <% } %>
+
+send it to this person!!!!!! <%= toUser %>
+<input id="sendTo" value = <%= toUser %> ></input>
+<input id = "username" value= <%= messageUser %> ></input>
 <div id="calendarTime"></div>
 <div id="calendarTime2"></div>
 <body>
@@ -31,8 +35,14 @@ var refresh_token = localStorage.getItem("refresh_token");
 var cal_id = localStorage.getItem("cal_id");
 $("#calendarTime2").html(cal_id);
 //window.location.replace("https://api.cronofy.com/v1/calendars");
-  $(function () {
-    var socket = io();
+$(function () {
+  var socket = io();
+  var messageUser = $("#username").val();
+  var sendToUser = $("#sendTo").val();
+      socket.emit("messageUser", messageUser);
+      console.log("emmited username");
+      socket.emit("toMessage", sendToUser);
+      console.log("emmited username");
     $('form').submit(function(){
       socket.emit('chat message', $('#m').val());
       $('#m').val('');
@@ -41,5 +51,9 @@ $("#calendarTime2").html(cal_id);
     socket.on('chat message', function(msg){
       $('#messages').append($('<li>').text(msg));
     });
+    socket.on('getUser', function(blah){
+      socket.emit("disconnectUser", "hiimdisconnecting");
+    });
+
   });
 </script>
