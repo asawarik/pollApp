@@ -165,9 +165,9 @@ var server = app.listen(50000, function(){
 var io = require("socket.io").listen(server);
 io.on('connection', function(socket){
   console.log('a user connected');
-  console.log(socket);
+  //console.log(socket);
   var socketid = socket.id;
-  console.log(socketid);
+  //console.log(socketid);
   socket.on('chat message', function(msg){
     console.log('message: ' + msg);
     io.sockets.connected[socketid].emit("chat message", "fdislajfiowjeifajflkadsj");

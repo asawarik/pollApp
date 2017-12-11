@@ -1,6 +1,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 wooo good job loggin in
-you are user <%= user.username %>
+you are user <%= user.cal_id %>
 these are the other users:
 <select>
 <% for(var i=0; i<allUsers.length; i++){ %>
@@ -9,6 +9,13 @@ these are the other users:
    </option>
 <% } %>
 </select>
+<form method="post" action="/users/poll">
+<input type="text" name="access_token" id="access_token">
+<input type="text" name="refresh_token" id="refresh_token">
+<input type="text" name="cal_id" id="cal_id">
+<input type="text" name = "currCalId" id="currCalId" value=<%=user.cal_id%> >
+<button type="submit"></button>
+</form>
 <script>
 $("select").change(function(){
     var access_token = $(this).find(":selected").data("value").access_token;
@@ -20,6 +27,10 @@ $("select").change(function(){
     localStorage["access_token"] = access_token;
     localStorage["refresh_token"] = refresh_token;
     localStorage["cal_id"] = cal_id;
-    window.location.replace("http://localhost:50000/users/poll");
+    $("#access_token").val(access_token);
+    $("#refresh_token").val(refresh_token);
+    $("#cal_id").val(cal_id);
+    //window.location.replace("http://localhost:50000/users/poll");
 });
+
 </script>

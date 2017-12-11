@@ -154,7 +154,66 @@ router.get('/poll', function(req, res){
   console.log("in the get");
   res.render('poll.html', {currUser: req.user});
 });
- 
+
+var headers100 = {
+    'Accept':     'application/json',
+    'Accept-Charset': 'utf-8',
+    Authorization: ""
+}
+
+// Configure the request
+var options100 = {
+    headers: headers100,
+    uri: 'https://api.cronofy.com/v1/availability',
+    method: 'POST',
+    json: {
+        "participants": [
+          {
+            "members": [
+              {     
+                "sub": "acc_5a1dde4fcd62561c6600009d" 
+              },
+              {
+                "sub": "acc_5a2d9856cd62565016000b9f"
+              }
+            ],
+            "required": "all"
+          }
+        ],
+        "required_duration": { "minutes": 30 },
+        "available_periods": [
+          {
+            "start": "2017-12-18T17:00:00Z",
+            "end": "2017-12-19T02:00:00Z"
+    }
+  ]
+}
+};
+router.post("/poll", function(req, res) {
+  console.log("REQUEST!!!!!!!!");
+  var times;
+  var calId = req.body.cal_id;
+  console.log(calId);
+  var access_token = req.body.access_token;
+  headers100["Authorization"] = "Bearer " + access_token;
+  request(options100, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+        //var parseBody = JSON.parse(body);
+        //console.log(body["available_periods"]);
+        times = body["available_periods"];
+        console.log("success!");
+        console.log(times);
+        res.render("poll.html", {times: times});
+    }
+    else {
+      console.log(error);
+      console.log(response.statusCode);
+      console.log("no");
+    }
+  });
+  //console.log(times);
+  
+});
 
 router.get('/loginFail', function(req, res){
   res.render('loginFail.html');

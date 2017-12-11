@@ -1,8 +1,7 @@
-
-
-<!doctype html>
-<html>
-  <head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<head>
     <title>Socket.IO chat</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,17 +13,24 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
     </style>
-  </head>
-  <body>
+</head>
+<% for(var i=0; i<times.length; i++){ %>
+   <li> <%=JSON.stringify(times[i]) %></li>
+<% } %>
+<div id="calendarTime"></div>
+<div id="calendarTime2"></div>
+<body>
     <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
   </body>
-</html>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script>
+var access_token = localStorage.getItem("access_token");
+var refresh_token = localStorage.getItem("refresh_token");
+var cal_id = localStorage.getItem("cal_id");
+$("#calendarTime2").html(cal_id);
+//window.location.replace("https://api.cronofy.com/v1/calendars");
   $(function () {
     var socket = io();
     $('form').submit(function(){
