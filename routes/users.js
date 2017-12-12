@@ -224,7 +224,7 @@ router.get('/loginFail', function(req, res){
 
 router.get('/loginSuccess', function(req, res){
   console.log("OMFG HERE IS THE SESSION");
-  console.log(req.sessionID);
+  console.log(req.user);
   hello = getAllUsers();
   function doStuff1() {
           if(template2== undefined) {//we want it to match

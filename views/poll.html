@@ -1,8 +1,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 <head>
-    <title>Socket.IO chat</title>
+    <title>Common Times</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -14,10 +15,13 @@
       #messages li:nth-child(odd) { background: #eee; }
     </style>
 </head>
+<ul class = "list-group">
 <% for(var i=0; i<times.length; i++){ %>
-   <li> <%=JSON.stringify(times[i]) %></li>
+  <% var resultObject = times[i]; %>
+   <li class="list-group-item"> start <%= resultObject["start"] %> end <%= resultObject["end"] %></li>
 <% } %>
-
+</ul>
+<br>
 send it to this person!!!!!! <%= toUser %>
 <input id="sendTo" value = <%= toUser %> ></input>
 <input id = "username" value= <%= messageUser %> ></input>
@@ -29,6 +33,10 @@ send it to this person!!!!!! <%= toUser %>
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
   </body>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 <script>
 var access_token = localStorage.getItem("access_token");
 var refresh_token = localStorage.getItem("refresh_token");
