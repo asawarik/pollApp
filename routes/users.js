@@ -221,11 +221,60 @@ router.get('/loginFail', function(req, res){
   res.render('loginFail.html');
 });
 
-
+var headers12 = {
+    'Accept':     'application/json',
+    'Accept-Charset': 'utf-8'
+}
+var options12 = {
+  headers: headers,
+  uri: 'https://api.cronofy.com/oauth/token',
+  method: 'POST',
+  json: {
+    "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
+    "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
+    "grant_type": "refresh_token",
+    "refresh_token": "-hVK8fez-XX19f6z8mX8Asf1k01_SNrW"
+}
+}
 router.get('/loginSuccess', function(req, res){
   console.log("OMFG HERE IS THE SESSION");
   console.log(req.user);
+  var user = req.user.username;
   hello = getAllUsers();
+  console.log(req.user.refresh_token);
+  options12["json"]["refresh_token"] = req.user.refresh_token;
+  //refresh the token first and then do this stuff
+  request(options12, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+        //var parseBody = JSON.parse(body);
+        //console.log(body["available_periods"]);
+        console.log("success!");
+        console.log(body);
+        console.log(body["access_token"]);
+        console.log(body["refresh_token"]);
+        var newAccessToken = body["access_token"];
+        var newRefreshToken = body["refresh_token"];
+        console.log(user);
+        User.findOneAndUpdate(
+          {"username": user}, 
+          { $set: {"access_token": newAccessToken} },
+          {new: true},
+          function(err, doc) {
+            if(err){
+              console.log("somehting went wrong!")
+            }
+            else {
+              console.log(doc);
+              console.log("ok apparently it went htrough");
+            }
+        });
+    }
+    else {
+      console.log(error);
+      console.log(response.statusCode);
+      console.log("no");
+    }
+  });
   function doStuff1() {
           if(template2== undefined) {//we want it to match
             //console.log (template)

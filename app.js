@@ -198,6 +198,7 @@ var io = require("socket.io").listen(server);
 var toMessage;
 var toSocket;
 io.on('connection', function(socket){
+  console.log("omg!!!");
   console.log('a user connected');
   var socketid = socket.id;
   socket.on('messageUser', function(user) {
@@ -216,6 +217,7 @@ io.on('connection', function(socket){
   });
   socket.on('chat message', function(msg){
     console.log('message: ' + msg);
+    console.log(toSocket);
     io.sockets.connected[toSocket].emit("chat message", msg);
     //io.emit('chat message', msg);
   });
