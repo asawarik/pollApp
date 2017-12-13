@@ -5,7 +5,7 @@
 <head>
     <title>Common Times</title>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
+      * { margin: 0; padding: 0;  }
       body { font: 13px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 30%; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
@@ -38,28 +38,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 <script>
-// function convertTimes(string) {
-//   int z;
-//   var date = true;
-//   var dateS;
-//   var timeS;
-//   for(z=0; z<string.length; z++) {
-//     if (string.charAt(i) == "T") {
-//       date = false;
-//       continue;
-//     }
-//     else if (date) {
-//       dateS += string.charAt(i);
-//     }
-//     else if (string.charAt(i) == "Z") {
-//       continue;
-//     }
-//     else {
-//       timeS += string.charAt(i);
-//     }
-//   }
-//   return ("start date is:" + dateS + "start time is:" + timeS);
-// };
 
 
 var access_token = localStorage.getItem("access_token");
@@ -67,25 +45,25 @@ var refresh_token = localStorage.getItem("refresh_token");
 var cal_id = localStorage.getItem("cal_id");
 
 //window.location.replace("https://api.cronofy.com/v1/calendars");
-// $(function () {
-//   var socket = io();
-//   var messageUser = $("#username").val();
-//   var sendToUser = $("#sendTo").val();
-//       socket.emit("messageUser", messageUser);
-//       console.log("emmited username");
-//       socket.emit("toMessage", sendToUser);
-//       console.log("emmited username");
-//     $('form').submit(function(){
-//       socket.emit('chat message', $('#m').val());
-//       $('#m').val('');
-//       return false;
-//     });
-//     socket.on('chat message', function(msg){
-//       $('#messages').append($('<li>').text(msg));
-//     });
-//     socket.on('getUser', function(blah){
-//       socket.emit("disconnectUser", "hiimdisconnecting");
-//     });
+$(function () {
+  var socket = io();
+  var messageUser = $("#username").val();
+  var sendToUser = $("#sendTo").val();
+      socket.emit("messageUser", messageUser);
+      console.log("emmited username");
+      socket.emit("toMessage", sendToUser);
+      console.log("emmited username");
+    $('form').submit(function(){
+      socket.emit('chat message', $('#m').val());
+      $('#m').val('');
+      return false;
+    });
+    socket.on('chat message', function(msg){
+      $('#messages').append($('<li>').text(msg));
+    });
+    socket.on('getUser', function(blah){
+      socket.emit("disconnectUser", "hiimdisconnecting");
+    });
 
-//   });
+  });
 </script>

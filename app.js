@@ -10,10 +10,27 @@ const session = require('express-session');
 const passport = require('passport');
 const config = require('./config/database');
 const request = require("request");
+var crypto = require("crypto");
 const connectedUsers = [];
 var currUser;
 //var request = require('request');
+function genuuid(callback) {
+  if (typeof(callback) !== 'function') {
+    return uuidFromBytes(crypto.randomBytes(16));
+  }
 
+  crypto.randomBytes(16, function(err, rnd) {
+    if (err) return callback(err);
+    callback(null, uuidFromBytes(rnd));
+  });
+}
+function uuidFromBytes(rnd) {
+  rnd[6] = (rnd[6] & 0x0f) | 0x40;
+  rnd[8] = (rnd[8] & 0x3f) | 0x80;
+  rnd = rnd.toString('hex').match(/(.{8})(.{4})(.{4})(.{4})(.{12})/);
+  rnd.shift();
+  return rnd.join('-');
+}
 mongoose.connect(config.database);
 let db = mongoose.connection;
 
@@ -104,11 +121,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Express Session Middleware
 app.use(cookieParser());
+// app.use(session({
+//   secret: 'keyboard cat',
+//   resave: true,
+//   saveUninitialized: true,
+// }));
 app.use(session({
+  genid: function(req) {
+    return genuuid() // use UUIDs for session IDs
+  },
   secret: 'keyboard cat',
-  resave: true,
-  saveUninitialized: true
-}));
+  name: "wtf"
+}))
 
 // Express Messages Middleware
 app.use(require('connect-flash')());
@@ -165,6 +189,7 @@ var server = app.listen(50000, function(){
 
 function findSocket(username, users) {
   var i;
+  console.log("in the find socket f unction");
   for (i=0; i < users.length; i++) {
     var userObject = users[i];
     if (userObject["username"] == username) {
@@ -197,6 +222,7 @@ function printArray(ugh) {
 var io = require("socket.io").listen(server);
 var toMessage;
 var toSocket;
+var fromSocket;
 io.on('connection', function(socket){
   console.log("omg!!!");
   console.log('a user connected');
@@ -204,11 +230,13 @@ io.on('connection', function(socket){
   socket.on('messageUser', function(user) {
     console.log("FROM USER ENTERED");
     console.log(user);
+    //fromSocket = user;
     connectedUsers.push({"username":user, "socketid":socketid});
     printArray(connectedUsers);
   });
   socket.on('toMessage', function(username) {
     console.log("TO USER ENtered");
+    console.log(username);
     toMessage = username;
     console.log(toMessage);
     toSocket = findSocket(toMessage, connectedUsers);
@@ -217,8 +245,12 @@ io.on('connection', function(socket){
   });
   socket.on('chat message', function(msg){
     console.log('message: ' + msg);
+    console.log(toMessage);
     console.log(toSocket);
-    io.sockets.connected[toSocket].emit("chat message", msg);
+    if (!(toSocket == "not online")) {
+        io.sockets.connected[toSocket].emit("chat message", msg);
+        //io.sockets.connected[fromSocket].emit("chat message", msg);
+      }
     //io.emit('chat message', msg);
   });
   socket.on('disconnect', function(){
