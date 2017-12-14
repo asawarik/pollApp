@@ -1,52 +1,131 @@
+//Handles all routes begining with URl localhost/users/
+//Constants
 const morgan = require('morgan');
 const request = require("request");
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require('passport');
+const Cronofy = require("cronofy");
 var template = null;
 var template2 = null;
 let User = require("../models/user");
 
+//Signup 
+router.get('/signup', function(req, res){
+  res.render('signup.html');
+});
+//Register
 router.get("/register", function(req, res) {
     res.render("register.html");
 });
-var headers = {
+// Login Form
+router.get('/login', function(req, res){
+  res.render('login.html');
+});
+
+// Login Process
+router.post('/login', function(req, res, next){
+  passport.authenticate('local', {
+    successRedirect:'/users/loginSuccess',
+    failureRedirect:'/users/loginFail',
+    failureFlash: true
+  })(req, res, next);
+});
+//Login Fail
+router.get('/loginFail', function(req, res){
+  res.render('loginFail.html');
+});
+
+//Login Pass Logic
+var loginPassHeaders = {
     'Accept':     'application/json',
     'Accept-Charset': 'utf-8'
 }
+var loginPassOptions = {
+  headers: loginPassHeaders,
+  uri: 'https://api.cronofy.com/oauth/token',
+  method: 'POST',
+  json: {
+    "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
+    "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
+    "grant_type": "refresh_token",
+    "refresh_token": "-hVK8fez-XX19f6z8mX8Asf1k01_SNrW"
+  }
+}
+router.get('/loginSuccess', function(req, res){
+  var user = req.user.username;
+  hello = getAllUsers();
+  loginPassOptions["json"]["refresh_token"] = req.user.refresh_token;
+  //refresh the token first and then do the rest of request
+  request(loginPassOptions, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+        var newAccessToken = body["access_token"];
+        var newRefreshToken = body["refresh_token"];
+        //save new tokens in db
+        User.findOneAndUpdate(
+          {"username": user}, 
+          { $set: {"access_token": newAccessToken} },
+          {new: true},
+          function(err, doc) {
+            if(err){
+              console.log("somehting went wrong!")
+            }
+            else {
+              console.log(doc);
+              console.log("ok apparently it went htrough");
+            }
+        });
+    }
+    else {
+      console.log(error);
+      console.log(response.statusCode);
+    }
+  });
+  //synchronously get all users
+  function syncGetUsers() {
+          if(template2== undefined) {//we want it to match
+            setTimeout(syncGetUsers, 50);//wait 50 millisecnds then recheck
+            return;
+          }
+        else {
+          if (!req.session.visitCount) {
+            req.session.visitCount = 1;
+          }
+          else {
+            req.session.visitCount += 1;
+          }
+          res.render('loginSuccess', {user: req.user, allUsers:template2});
+        }
+      }//closes do stuff function
+      syncGetUsers();
+});
 
+// Logout Process
+router.get('/logout', function(req, res){
+  req.logout();
+  req.flash('success', 'You are logged out');
+  res.redirect('/users/login');
+});
+
+/////DB saving and register config
 // Configure the request
-var options = {
-    headers: headers,
-    uri: 'https://api.cronofy.com/oauth/token',
-    method: 'POST',
-    json: { "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
-            "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
-            "grant_type": "authorization_code",
-            "code":"KdOEy_iNu78aetLs8QxUh2qsuXh4GV5X",
-            "redirect_uri": "http://localhost:50000/users/register"
-        }   
-};
-
-var headers1 = {
+var calIdHeaders = {
     'Accept':     'application/json',
     'Accept-Charset': 'utf-8',
     Authorization: ""
 }
 
-// Configure the request
-var options1 = {
-    headers: headers1,
+var calIdOptions = {
+    headers: calIdHeaders,
     uri: 'https://api.cronofy.com/v1/userinfo',
     method: 'GET'
 };
 function getCalID(access_token) {
-  headers1["Authorization"] = "Bearer " + access_token;
-  request(options1, function(error, response, body) {
+  calIdHeaders["Authorization"] = "Bearer " + access_token;
+  request(calIdOptions, function(error, response, body) {
     if (!error && response.statusCode == 200) {
         var parseBody = JSON.parse(body);
-        console.log(parseBody);
         template = parseBody["sub"];
 
     }
@@ -55,9 +134,9 @@ function getCalID(access_token) {
     }
   });
 };
-//adding new user to the db
+
+//User registers and is added the DB
 router.post("/register", function(req, res) {
-    //console.log("im here");
     const email = req.body.email;
     const username = req.body.username;
     const password = req.body.password;
@@ -65,12 +144,8 @@ router.post("/register", function(req, res) {
     const code = req.body.code;
     var access_token = "";
     options["json"]["code"] = code;
-    //console.log("CODEEEEE");
-    //console.log(options);
     request(options, function (error, response, body) {
-      console.log("fejwjfWEEEE");
       if (!error && response.statusCode == 200) {
-        console.log("HELLLLO IM HERE");
         access_token = body["access_token"];
         refresh_token = body["refresh_token"];
         calID = getCalID(access_token);
@@ -82,9 +157,6 @@ router.post("/register", function(req, res) {
           }
         else {
         calId = template;
-        console.log(calID);
-        console.log(template);
-        console.log(access_token);
         let newUser = new User({
           email:email,
           username:username,
@@ -119,42 +191,8 @@ router.post("/register", function(req, res) {
       } //if !error statement  
     }); //request function   
 }); //router post
-//Fetching all users from the db 
-router.get('/yay', function(req, res) {
-  User.find({}, function(err, docs) {
-    if(err) {
-    res.json(err);
-    } else {
-      console.log(docs);
-      res.render('yay', {users: docs});
-    }
-  });
-});
 
-
-// Login Form
-router.get('/login', function(req, res){
-  res.render('login.html');
-});
-
-const Cronofy = require("cronofy");
-var cronofyClient = new Cronofy({
-  "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
-  "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
-  "access_token": "1NPQTGQ7pEnkLnjfGqZwopB3BC2y1Ite",
-  "refresh_token": "-2-bhZ-6BRIm5biGHNuagBagUv4SfFUw"
-});
- var options7 = {
-  from: "2017-12-08",
-  to: "2017-12-09",
-  tzid: "America/Indianapolis"
-}
-router.get('/poll', function(req, res){
-  console.log(req.sessionID);
-  console.log("in the get");
-  res.render('poll.html', {currUser: req.user});
-});
-
+//Scheduled Time Config 
 var headers100 = {
     'Accept':     'application/json',
     'Accept-Charset': 'utf-8',
@@ -189,6 +227,9 @@ var options100 = {
   ]
 }
 };
+
+
+//Let user see time results for person selected 
 router.post("/poll", function(req, res) {
   console.log("REQUEST!!!!!!!!");
   var times;
@@ -217,89 +258,45 @@ router.post("/poll", function(req, res) {
   
 });
 
-router.get('/loginFail', function(req, res){
-  res.render('loginFail.html');
-});
 
-var headers12 = {
+
+
+var headers = {
     'Accept':     'application/json',
     'Accept-Charset': 'utf-8'
 }
-var options12 = {
-  headers: headers,
-  uri: 'https://api.cronofy.com/oauth/token',
-  method: 'POST',
-  json: {
-    "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
-    "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
-    "grant_type": "refresh_token",
-    "refresh_token": "-hVK8fez-XX19f6z8mX8Asf1k01_SNrW"
+
+// Configure the request
+var options = {
+    headers: headers,
+    uri: 'https://api.cronofy.com/oauth/token',
+    method: 'POST',
+    json: { "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
+            "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
+            "grant_type": "authorization_code",
+            "code":"KdOEy_iNu78aetLs8QxUh2qsuXh4GV5X",
+            "redirect_uri": "http://localhost:50000/users/register"
+        }   
+};
+
+
+var cronofyClient = new Cronofy({
+  "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
+  "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
+  "access_token": "1NPQTGQ7pEnkLnjfGqZwopB3BC2y1Ite",
+  "refresh_token": "-2-bhZ-6BRIm5biGHNuagBagUv4SfFUw"
+});
+ var options7 = {
+  from: "2017-12-08",
+  to: "2017-12-09",
+  tzid: "America/Indianapolis"
 }
-}
-router.get('/loginSuccess', function(req, res){
-  console.log("OMFG HERE IS THE SESSION");
-  console.log(req.user);
-  var user = req.user.username;
-  hello = getAllUsers();
-  console.log(req.user.refresh_token);
-  options12["json"]["refresh_token"] = req.user.refresh_token;
-  //refresh the token first and then do this stuff
-  request(options12, function(error, response, body) {
-    if (!error && response.statusCode == 200) {
-        //var parseBody = JSON.parse(body);
-        //console.log(body["available_periods"]);
-        console.log("success!");
-        console.log(body);
-        console.log(body["access_token"]);
-        console.log(body["refresh_token"]);
-        var newAccessToken = body["access_token"];
-        var newRefreshToken = body["refresh_token"];
-        console.log(user);
-        User.findOneAndUpdate(
-          {"username": user}, 
-          { $set: {"access_token": newAccessToken} },
-          {new: true},
-          function(err, doc) {
-            if(err){
-              console.log("somehting went wrong!")
-            }
-            else {
-              console.log(doc);
-              console.log("ok apparently it went htrough");
-            }
-        });
-    }
-    else {
-      console.log(error);
-      console.log(response.statusCode);
-      console.log("no");
-    }
-  });
-  function doStuff1() {
-          if(template2== undefined) {//we want it to match
-            //console.log (template)
-            setTimeout(doStuff1, 50);//wait 50 millisecnds then recheck
-            return;
-          }
-        else {
-          if (!req.session.visitCount) {
-            req.session.visitCount = 1;
-          }
-          else {
-            req.session.visitCount += 1;
-          }
-          //console.log(req.session);
-          //console.log("END O FSESIOFID");
-          //console.log(template2);
-          res.render('loginSuccess', {user: req.user, allUsers:template2});
-        }
-      }//closes do stuff function
-      doStuff1();
+router.get('/poll', function(req, res){
+  res.render('poll.html', {currUser: req.user});
 });
 
-router.get('/signup', function(req, res){
-  res.render('signup.html');
-});
+
+//Helper Functions
 function getAllUsers() {
   var allUsers;
   User.find({}, function(err, docs) {
@@ -312,21 +309,7 @@ function getAllUsers() {
     }
   });
 };
-// Login Process
-router.post('/login', function(req, res, next){
-  passport.authenticate('local', {
-    successRedirect:'/users/loginSuccess',
-    failureRedirect:'/users/loginFail',
-    failureFlash: true
-  })(req, res, next);
-});
 
-// logout
-router.get('/logout', function(req, res){
-  req.logout();
-  req.flash('success', 'You are logged out');
-  res.redirect('/users/login');
-});
 
 module.exports = router;
 

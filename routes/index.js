@@ -1,3 +1,4 @@
+//Handles any URL's that are localhost/ 
 const express = require("express");
 const router = express.Router();
 

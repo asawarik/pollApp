@@ -47,41 +47,6 @@ db.on('error', function(err){
 // Init App
 const app = express();
 
-// const Cronofy = require("cronofy");
-// var cronofyClient = new Cronofy({
-//   "client_id": "kr6-FkR4BVLCYE2uQHbzqPSGI_6rWV-D",
-//   "client_secret": "jr-6gY6mQAgOa3KhbLhIYP0F6WjpRBMKXUPNrFB5WGwllrNM2Ao6PPQHtOb2m0zyDUH4D_-K2RFfOcy--ML8wA",
-//   "access_token": "1NPQTGQ7pEnkLnjfGqZwopB3BC2y1Ite",
-//   "refresh_token": "-2-bhZ-6BRIm5biGHNuagBagUv4SfFUw"
-// });
- 
-// var options = {
-//   code: 'GOv3mzT-bZQlLA_wE-o_v8eVvVkXCkDc',
-//   redirect_uri: 'http://localhost:50000/users/register'
-// };
-// var options = {
-//    tzid: "Etc/UTC"
-//  }
-// var options = {
-//   from: "2017-12-08",
-//   to: "2017-12-09",
-//   tzid: "America/Indianapolis"
-// }
-// var headers1 = {
-//     'Accept':     'application/json',
-//     'Accept-Charset': 'utf-8',
-//     Authorization: "Bearer 1NPQTGQ7pEnkLnjfGqZwopB3BC2y1Ite"
-// }
-
-// // Configure the request
-// var options1 = {
-//     headers: headers1,
-//     uri: 'https://api.cronofy.com/v1/userinfo',
-//     method: 'GET'
-// };
-
-// Bring in Models
-
 // Load View Engine
 var engines = require('consolidate');
 
@@ -91,25 +56,7 @@ var engines = require('consolidate');
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs')
 app.engine('html', require('ejs').renderFile);
-// app.get('/', function(req, res){
-//   console.log(req.session);
-//   console.log("in the get");
-//   // cronofyClient.freeBusy(options)
-//   // .then(function(response){
-//   //   console.log(response);
-//   // });
-//   // request(options1, function (error, response, body) {
-      
-//   //     if (!error && response.statusCode == 200) {
-//   //       console.log("HELLLLO IM HERE");
-//   //       console.log(body);
-//   //     }
-//   //     else{
-//   //       console.log("flisajf");
-//   //     }
-//   // });
-//   res.render('index.html');
-// });
+
 // Body Parser Middleware
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -127,12 +74,11 @@ app.use(cookieParser());
 //   saveUninitialized: true,
 // }));
 app.use(session({
-  genid: function(req) {
-    return genuuid() // use UUIDs for session IDs
-  },
   secret: 'keyboard cat',
-  name: "wtf"
-}))
+  resave: true,
+  saveUninitialized: true
+}));
+
 
 // Express Messages Middleware
 app.use(require('connect-flash')());
@@ -188,17 +134,18 @@ var server = app.listen(50000, function(){
 });
 
 function findSocket(username, users) {
+  console.log(username);
   var i;
-  console.log("in the find socket f unction");
+  console.log("in the find socket function");
   for (i=0; i < users.length; i++) {
     var userObject = users[i];
     if (userObject["username"] == username) {
         return userObject["socketid"];
     }
-  else {
-    return "not online"
   }
-}
+  printArray(users);
+  return "not online"
+
 };
 
 function removeSocket(disconnectId, users) {
@@ -224,33 +171,26 @@ var toMessage;
 var toSocket;
 var fromSocket;
 io.on('connection', function(socket){
-  console.log("omg!!!");
-  console.log('a user connected');
+  console.log("user connected");
   var socketid = socket.id;
   socket.on('messageUser', function(user) {
     console.log("FROM USER ENTERED");
-    console.log(user);
     //fromSocket = user;
     connectedUsers.push({"username":user, "socketid":socketid});
     printArray(connectedUsers);
   });
-  socket.on('toMessage', function(username) {
-    console.log("TO USER ENtered");
-    console.log(username);
-    toMessage = username;
-    console.log(toMessage);
-    toSocket = findSocket(toMessage, connectedUsers);
-    console.log(toSocket);
-    //console.log(connectedUsers.toString);
-  });
+  
   socket.on('chat message', function(msg){
     console.log('message: ' + msg);
-    console.log(toMessage);
-    console.log(toSocket);
+    socket.on('toMessage', function(username) {
+      toMessage = username;
+      toSocket = findSocket(toMessage, connectedUsers);
     if (!(toSocket == "not online")) {
         io.sockets.connected[toSocket].emit("chat message", msg);
         //io.sockets.connected[fromSocket].emit("chat message", msg);
       }
+  });
+    
     //io.emit('chat message', msg);
   });
   socket.on('disconnect', function(){
@@ -263,8 +203,4 @@ io.on('connection', function(socket){
     // io.emit('getUser', "blah");
     // console.log("cinpmleted the disconnect");
   });
-  // socket.on("disconnectUser", function(disconnectUser) {
-  //     console.log("hello i am in socket.on");
-  //     removeSocket(disconnectUser, disconnectId, connectedUsers);
-  //   });
 });

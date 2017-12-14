@@ -1,3 +1,4 @@
+//how a user is saved into the databse
 const mongoose= require("mongoose");
 const UserSchema = mongoose.Schema ({
     email: {
