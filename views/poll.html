@@ -8,7 +8,9 @@
 <ul class = "list-group">
 <% for(var i=0; i<times.length; i++){ %>
   <% var resultObject = times[i]; %>
-   <li class="list-group-item"> start <%=resultObject["start"]%> end <%= resultObject["end"] %></li>
+  <% var startTime = new Date(resultObject["start"]) %>
+  <% var endTime = new Date(resultObject["end"]) %>
+   <li class="list-group-item"> start <%=startTime.toDateString()%> <%=startTime.toTimeString()%>end <%=endTime.toDateString()%> <%=endTime.toTimeString()%></li>
 <% } %>
 </ul>
 <br>
