@@ -171,11 +171,8 @@ var toMessage;
 var toSocket;
 var fromSocket;
 io.on('connection', function(socket){
-  console.log("user connected");
   var socketid = socket.id;
   socket.on('messageUser', function(user) {
-    console.log("FROM USER ENTERED");
-    //fromSocket = user;
     connectedUsers.push({"username":user, "socketid":socketid});
     printArray(connectedUsers);
   });

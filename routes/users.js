@@ -55,6 +55,7 @@ var loginPassOptions = {
 }
 router.get('/loginSuccess', function(req, res){
   var user = req.user.username;
+  console.log(req.user);
   hello = getAllUsers();
   loginPassOptions["json"]["refresh_token"] = req.user.refresh_token;
   //refresh the token first and then do the rest of request
@@ -251,6 +252,7 @@ router.post("/poll", function(req, res) {
     else {
       console.log(error);
       console.log(response.statusCode);
+      //if it's a 401, refresh the user's token
       console.log("no");
     }
   });
